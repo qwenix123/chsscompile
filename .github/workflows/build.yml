@@ -1,0 +1,44 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app
+
+      - name: Build App & Extension (unsigned)
+        run: |
+          xcodebuild \
+            -project Ch3ssClient-iOS.xcodeproj \
+            -scheme Ch3ssClient \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package into IPA
+        run: |
+          mkdir -p Payload
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "Ch3ssClient.app" -type d | head -n 1)
+          echo "Found app at: $APP_PATH"
+          cp -r "$APP_PATH" Payload/
+          zip -r Ch3ssClient-v1.1.ipa Payload
+          echo "IPA created successfully"
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ch3ssClient-v1.1-ipa
+          path: Ch3ssClient-v1.1.ipa
