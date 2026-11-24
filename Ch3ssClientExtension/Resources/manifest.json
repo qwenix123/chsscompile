@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "Ch3ss Client",
+  "version": "1.1",
+  "description": "Chess auto-play extension for chess.com",
+  "permissions": ["storage", "tabs"],
+  "host_permissions": [
+    "https://www.chess.com/*",
+    "https://chess.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Ch3ss Client",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.chess.com/*", "https://chess.com/*"],
+      "css": ["board-overlay.css"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
